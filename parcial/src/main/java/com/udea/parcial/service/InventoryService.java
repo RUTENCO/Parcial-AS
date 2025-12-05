@@ -1,7 +1,7 @@
 package com.udea.parcial.service;
 
 import com.udea.parcial.dto.InventoryDTO;
-import com.udea.parcial.dto.InventoryRequest;
+import com.udea.parcial.dto.InventoryRequestDTO;
 import com.udea.parcial.entity.Inventory;
 import com.udea.parcial.entity.Product;
 import com.udea.parcial.entity.Warehouse;
@@ -25,6 +25,9 @@ public class InventoryService {
 
     // ---------- PUNTO 1: CONSULTAR INVENTARIO POR ALMACÉN ----------
     public List<InventoryDTO> getInventoryByWarehouse(Long warehouseId) {
+        // Verificar que el almacén existe
+        warehouseRepository.findById(warehouseId)
+                .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + warehouseId));
 
         List<Inventory> lista = inventoryRepository.findByAlmacenId(warehouseId);
 
@@ -34,19 +37,30 @@ public class InventoryService {
     }
 
     // ---------- PUNTO 2: REGISTRAR STOCK EN INVENTARIO ----------
-    public InventoryDTO addInventory(InventoryRequest request) {
+    public InventoryDTO addInventory(InventoryRequestDTO request) {
 
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
-                .orElseThrow(() -> new RuntimeException("Almacén no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + request.getWarehouseId()));
 
         Product product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + request.getProductId()));
 
-        Inventory inv = inventoryMapper.toEntity(
-                warehouse,
-                product,
-                request.getCantidad()
-        );
+        // Verificar si ya existe inventario para este producto en este almacén
+        var existingInventory = inventoryRepository.findByAlmacenIdAndProductoId(
+                request.getWarehouseId(), request.getProductId());
+
+        Inventory inv;
+        if (existingInventory.isPresent()) {
+            // Actualizar cantidad existente
+            inv = existingInventory.get();
+            inv.setCantidad(inv.getCantidad() + request.getCantidad());
+        } else {
+            // Crear nuevo registro
+            inv = new Inventory();
+            inv.setAlmacen(warehouse);
+            inv.setProducto(product);
+            inv.setCantidad(request.getCantidad());
+        }
 
         inventoryRepository.save(inv);
 

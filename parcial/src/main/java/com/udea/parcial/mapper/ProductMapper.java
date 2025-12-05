@@ -12,7 +12,7 @@ public class ProductMapper {
         dto.setId(entity.getId());
         dto.setNombre(entity.getNombre());
         dto.setDescripcion(entity.getDescripcion());
-        dto.setPrecio(entity.getPrecio().doubleValue());
+        dto.setPrecio(entity.getPrecio());
         return dto;
     }
 
@@ -21,7 +21,7 @@ public class ProductMapper {
         entity.setId(dto.getId());
         entity.setNombre(dto.getNombre());
         entity.setDescripcion(dto.getDescripcion());
-        entity.setPrecio(java.math.BigDecimal.valueOf(dto.getPrecio()));
+        entity.setPrecio(dto.getPrecio());
         return entity;
     }
 }

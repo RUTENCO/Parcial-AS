@@ -20,21 +20,23 @@ services:
       - red-parcial
 
   # SERVICIO 2: Tu API (Spring Boot)
-  # app:
-  #   build: .
-  #   container_name: parcial_api
-  #   ports:
-  #     - "8080:8080" # Asumiendo que Spring corre en el 8080
-  #   depends_on:
-  #     - db
-  #   environment:
-  #     # OJO: Aquí sobreescribimos la conexión para que use Docker
-  #     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/inventario_db
-  #     SPRING_DATASOURCE_USERNAME: admin
-  #     SPRING_DATASOURCE_PASSWORD: password123
-  #     SPRING_JPA_HIBERNATE_DDL_AUTO: update
-  #   networks:
-  #     - red-parcial
+  app:
+    build: .
+    container_name: parcial_api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      # Variables para conectar con la DB de Docker
+      DB_HOST_PROD: db
+      DB_PORT_PROD: 5432
+      DB_NAME_PROD: inventario_db
+      DB_USER_PROD: admin
+      DB_PASSWORD_PROD: password123
+      DB_SSLMODE_PROD: disable
+    networks:
+      - red-parcial
 
 volumes:
   db_data:
