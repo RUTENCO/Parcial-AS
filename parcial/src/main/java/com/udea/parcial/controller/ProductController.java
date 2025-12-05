@@ -1,4 +1,0 @@
-package com.udea.parcial.controller;
-
-public class ProductController {
-}
