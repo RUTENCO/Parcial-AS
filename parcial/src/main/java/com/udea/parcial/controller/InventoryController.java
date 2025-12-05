@@ -1,7 +1,7 @@
 package com.udea.parcial.controller;
 
-import com.udea.parcial.dto.InventoryDTO;
-import com.udea.parcial.dto.InventoryRequest;
+import com.udea.parcial.DTO.InventoryDTO;
+import com.udea.parcial.DTO.InventoryRequestDTO;
 import com.udea.parcial.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +17,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -45,7 +46,7 @@ public class InventoryController {
             @Parameter(description = "ID de la sede a consultar", example = "1", required = true)
             @RequestParam Long warehouseId) {
 
-        List<InventoryDTO> data = service.getInventoryByWarehouse(warehouseId);
+        List<InventoryDTO> data = Collections.singletonList(service.getInventoryByWarehouse(warehouseId));
 
         List<EntityModel<InventoryDTO>> lista = data.stream().map(inv ->
                 EntityModel.of(inv,
@@ -70,8 +71,8 @@ public class InventoryController {
     })
     public EntityModel<InventoryDTO> addInventory(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del nuevo inventario", required = true,
-                    content = @Content(schema = @Schema(implementation = InventoryRequest.class)))
-            @RequestBody InventoryRequest request,
+                    content = @Content(schema = @Schema(implementation = InventoryRequestDTO.class)))
+            @RequestBody InventoryRequestDTO request,
 
             @Parameter(in = ParameterIn.HEADER, name = "X-API-VERSION", required = true, example = "v1")
             @RequestHeader("X-API-VERSION") String version) {

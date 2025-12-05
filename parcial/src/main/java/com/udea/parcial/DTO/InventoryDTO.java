@@ -1,10 +1,10 @@
-package com.udea.parcial.dto;
+package com.udea.parcial.DTO;
 
 import lombok.Data;
 import java.util.List;
 
 @Data
 public class InventoryDTO {
-    private WarehouseDTO almacen;
-    private List<ProductInventoryDTO> productos;
+    private com.udea.parcial.DTO.WarehouseDTO almacen;
+    private List<com.udea.parcial.DTO.ProductInventoryDTO> productos;
 }
