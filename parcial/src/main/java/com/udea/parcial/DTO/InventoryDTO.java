@@ -1,4 +1,4 @@
-package com.udea.parcial.dto;
+package com.udea.parcial.DTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Schema(description = "Datos de inventario de un producto en un almacén")
 public class InventoryDTO {
+
     
     @Schema(description = "ID del inventario", example = "1")
     private Long id;
@@ -18,4 +19,5 @@ public class InventoryDTO {
     
     @Schema(description = "Cantidad disponible", example = "100")
     private Integer cantidad;
+
 }

@@ -1,6 +1,6 @@
 package com.udea.parcial.mapper;
 
-import com.udea.parcial.dto.ProductDTO;
+import com.udea.parcial.DTO.ProductDTO;
 import com.udea.parcial.entity.Product;
 import org.springframework.stereotype.Component;
 

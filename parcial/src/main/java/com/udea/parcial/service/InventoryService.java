@@ -1,5 +1,6 @@
 package com.udea.parcial.service;
 
+
 import com.udea.parcial.dto.InventoryDTO;
 import com.udea.parcial.dto.InventoryRequestDTO;
 import com.udea.parcial.entity.Inventory;
@@ -11,6 +12,7 @@ import com.udea.parcial.repository.ProductRepository;
 import com.udea.parcial.repository.WarehouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,17 +26,27 @@ public class InventoryService {
     private final InventoryMapper inventoryMapper;
 
     // ---------- PUNTO 1: CONSULTAR INVENTARIO POR ALMACÉN ----------
+
     public List<InventoryDTO> getInventoryByWarehouse(Long warehouseId) {
         // Verificar que el almacén existe
         warehouseRepository.findById(warehouseId)
                 .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + warehouseId));
 
-        List<Inventory> lista = inventoryRepository.findByAlmacenId(warehouseId);
+        // 1. Convertir Long a Integer si tus entidades usan Integer (muy común en parciales)
+        Integer idInt = warehouseId.intValue();
 
-        return lista.stream()
-                .map(inventoryMapper::toDTO)
-                .toList();
+        // 2. Buscar primero el Almacén (para la cabecera del JSON)
+        Warehouse warehouse = warehouseRepository.findById(Long.valueOf(idInt))
+                .orElseThrow(() -> new RuntimeException("Almacén no encontrado con ID: " + warehouseId));
+
+        // 3. Buscar los productos de ese almacén
+        List<Inventory> listaInventario = inventoryRepository.findByAlmacenId(idInt);
+
+        // 4. Usar el Mapper inteligente para unir todo
+        // (Este es el método toInventoryDTO(Warehouse, List<Inventory>) que creamos antes)
+        return inventoryMapper.toInventoryDTO(warehouse, listaInventario);
     }
+
 
     // ---------- PUNTO 2: REGISTRAR STOCK EN INVENTARIO ----------
     public InventoryDTO addInventory(InventoryRequestDTO request) {
@@ -62,8 +74,12 @@ public class InventoryService {
             inv.setCantidad(request.getCantidad());
         }
 
-        inventoryRepository.save(inv);
+        // Guardar
+        Inventory savedInv = inventoryRepository.save(inv);
 
-        return inventoryMapper.toDTO(inv);
+        // Retornar respuesta
+        // TRUCO: Como el DTO de respuesta es complejo, creamos una lista de 1 solo elemento
+        // para poder reutilizar el mapper grande.
+        return inventoryMapper.toInventoryDTO(warehouse, List.of(savedInv));
     }
 }

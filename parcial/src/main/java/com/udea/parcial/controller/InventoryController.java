@@ -1,7 +1,9 @@
 package com.udea.parcial.controller;
 
+
 import com.udea.parcial.dto.InventoryDTO;
 import com.udea.parcial.dto.InventoryRequestDTO;
+
 import com.udea.parcial.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +20,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
@@ -46,7 +49,7 @@ public class InventoryController {
             @Parameter(description = "ID de la sede a consultar", example = "1")
             @RequestParam Long warehouseId) {
 
-        List<InventoryDTO> data = service.getInventoryByWarehouse(warehouseId);
+        List<InventoryDTO> data = Collections.singletonList(service.getInventoryByWarehouse(warehouseId));
 
         List<EntityModel<InventoryDTO>> lista = data.stream().map(inv ->
                 EntityModel.of(inv,
@@ -69,8 +72,10 @@ public class InventoryController {
             @ApiResponse(responseCode = "200", description = "Inventario actualizado/creado"),
             @ApiResponse(responseCode = "409", description = "Conflicto: El producto ya existe en esa sede (si aplica restricción)")
     })
+
     public ResponseEntity<EntityModel<InventoryDTO>> addInventory(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del nuevo inventario",
+
                     content = @Content(schema = @Schema(implementation = InventoryRequestDTO.class)))
             @RequestBody InventoryRequestDTO request,
 

@@ -1,17 +1,22 @@
 package com.udea.parcial.mapper;
 
+
 import com.udea.parcial.dto.InventoryDTO;
 import com.udea.parcial.dto.WarehouseDTO;
 import com.udea.parcial.dto.ProductDTO;
+
 import com.udea.parcial.entity.Inventory;
-import com.udea.parcial.entity.Product;
 import com.udea.parcial.entity.Warehouse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 @RequiredArgsConstructor
 public class InventoryMapper {
+
 
     private final WarehouseMapper warehouseMapper;
     private final ProductMapper productMapper;
@@ -24,4 +29,5 @@ public class InventoryMapper {
         dto.setCantidad(inv.getCantidad());
         return dto;
     }
+
 }
