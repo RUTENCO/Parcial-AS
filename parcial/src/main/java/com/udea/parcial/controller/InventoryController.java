@@ -1,7 +1,9 @@
 package com.udea.parcial.controller;
 
-import com.udea.parcial.DTO.InventoryDTO;
-import com.udea.parcial.DTO.InventoryRequestDTO;
+
+import com.udea.parcial.dto.InventoryDTO;
+import com.udea.parcial.dto.InventoryRequestDTO;
+
 import com.udea.parcial.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -23,7 +26,7 @@ import java.util.List;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
-@RequestMapping("/inventory")
+@RequestMapping("/api/v1/inventory")
 @RequiredArgsConstructor
 @Tag(name = "Inventario", description = "Gestión de existencias por Sede (Warehouse)")
 public class InventoryController {
@@ -39,11 +42,11 @@ public class InventoryController {
             @ApiResponse(responseCode = "400", description = "Parámetros inválidos o Header faltante"),
             @ApiResponse(responseCode = "404", description = "Sede (Warehouse) no encontrada")
     })
-    public CollectionModel<EntityModel<InventoryDTO>> getInventory(
-            @Parameter(in = ParameterIn.HEADER, name = "X-API-VERSION", required = true, example = "v1", description = "Versión de la API (v1)")
+    public ResponseEntity<CollectionModel<EntityModel<InventoryDTO>>> getInventory(
+            @Parameter(in = ParameterIn.HEADER, name = "X-API-VERSION", description = "Versión de la API (v1)", example = "v1")
             @RequestHeader("X-API-VERSION") String version,
 
-            @Parameter(description = "ID de la sede a consultar", example = "1", required = true)
+            @Parameter(description = "ID de la sede a consultar", example = "1")
             @RequestParam Long warehouseId) {
 
         List<InventoryDTO> data = Collections.singletonList(service.getInventoryByWarehouse(warehouseId));
@@ -55,10 +58,10 @@ public class InventoryController {
                 )
         ).toList();
 
-        return CollectionModel.of(lista,
+        return ResponseEntity.ok(CollectionModel.of(lista,
                 linkTo(methodOn(InventoryController.class)
                         .getInventory(version, warehouseId)).withSelfRel()
-        );
+        ));
     }
 
     // ---------- PUNTO 2: POST INVENTARIO ----------
@@ -69,21 +72,23 @@ public class InventoryController {
             @ApiResponse(responseCode = "200", description = "Inventario actualizado/creado"),
             @ApiResponse(responseCode = "409", description = "Conflicto: El producto ya existe en esa sede (si aplica restricción)")
     })
-    public EntityModel<InventoryDTO> addInventory(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del nuevo inventario", required = true,
+
+    public ResponseEntity<EntityModel<InventoryDTO>> addInventory(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Datos del nuevo inventario",
+
                     content = @Content(schema = @Schema(implementation = InventoryRequestDTO.class)))
             @RequestBody InventoryRequestDTO request,
 
-            @Parameter(in = ParameterIn.HEADER, name = "X-API-VERSION", required = true, example = "v1")
+            @Parameter(in = ParameterIn.HEADER, name = "X-API-VERSION", example = "v1")
             @RequestHeader("X-API-VERSION") String version) {
 
         InventoryDTO dto = service.addInventory(request);
 
-        return EntityModel.of(dto,
+        return ResponseEntity.ok(EntityModel.of(dto,
                 linkTo(methodOn(InventoryController.class)
                         .addInventory(request, version)).withSelfRel(),
                 linkTo(methodOn(InventoryController.class)
                         .getInventory(version, request.getWarehouseId())).withRel("ver-inventario")
-        );
+        ));
     }
 }

@@ -1,10 +1,23 @@
 package com.udea.parcial.DTO;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import java.util.List;
 
 @Data
+@Schema(description = "Datos de inventario de un producto en un almacén")
 public class InventoryDTO {
-    private com.udea.parcial.DTO.WarehouseDTO almacen;
-    private List<com.udea.parcial.DTO.ProductInventoryDTO> productos;
+
+    
+    @Schema(description = "ID del inventario", example = "1")
+    private Long id;
+    
+    @Schema(description = "Información del almacén")
+    private WarehouseDTO almacen;
+    
+    @Schema(description = "Información del producto")
+    private ProductDTO producto;
+    
+    @Schema(description = "Cantidad disponible", example = "100")
+    private Integer cantidad;
+
 }
