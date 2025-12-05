@@ -1,4 +1,4 @@
 package com.udea.parcial.mapper;
 
-public class ProductoMapper {
+public class ProductMapper {
 }
