@@ -1,9 +1,43 @@
+version: '3.8'
+
 services:
-  postgres:
-    image: 'postgres:latest'
+  # SERVICIO 1: Base de Datos
+  db:
+    image: postgres:15-alpine
+    container_name: parcial_db
+    restart: always
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: inventario_db
     ports:
-      - '5432'
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # Aquí carga el script init.sql automáticamente
+      - ./db-init:/docker-entrypoint-initdb.d
+    networks:
+      - red-parcial
+
+  # SERVICIO 2: Tu API (Spring Boot)
+  # app:
+  #   build: .
+  #   container_name: parcial_api
+  #   ports:
+  #     - "8080:8080" # Asumiendo que Spring corre en el 8080
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     # OJO: Aquí sobreescribimos la conexión para que use Docker
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/inventario_db
+  #     SPRING_DATASOURCE_USERNAME: admin
+  #     SPRING_DATASOURCE_PASSWORD: password123
+  #     SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  #   networks:
+  #     - red-parcial
+
+volumes:
+  db_data:
+
+networks:
+  red-parcial:
