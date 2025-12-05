@@ -1,4 +1,4 @@
-package com.udea.parcial.dto;
+package com.udea.parcial.DTO;
 
 import lombok.Data;
 
